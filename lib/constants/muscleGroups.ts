@@ -1,5 +1,30 @@
-// Muscle groups with their corresponding 3D models
-export const MUSCLE_GROUPS = {
+// components/3D/muscleGroups.ts
+
+type Vector3Tuple = [number, number, number];
+type EulerTuple = [number, number, number];
+
+export interface Workout {
+  name: string;
+  type: string;
+  equipment: string;
+  cues: string;
+  sampleSetsReps: string;
+}
+
+export interface MuscleGroup {
+  name: string;
+  color: string;
+  position: Vector3Tuple;
+  scale: Vector3Tuple;
+  rotation: EulerTuple;
+  opacity: number;
+  modelPath: string;
+  description: string;
+  primaryFunctions: string[];
+  workouts: Workout[];
+}
+
+export const MUSCLE_GROUPS: Record<string, MuscleGroup> = {
   chest: {
     name: 'Chest',
     color: '#ff4444',
@@ -13,7 +38,7 @@ export const MUSCLE_GROUPS = {
     workouts: [
       {
         name: 'Barbell Bench Press',
-        type: 'Compound', 
+        type: 'Compound',
         equipment: 'Barbell, bench',
         cues: 'Keep shoulder blades pinched, drive through chest, full range of motion.',
         sampleSetsReps: '4 sets x 6–8 reps',
@@ -172,7 +197,7 @@ export const MUSCLE_GROUPS = {
   back: {
     name: 'Back',
     color: '#ffb144',
-    position: [0.00, 0.46, -0.15],
+    position: [0.0, 0.46, -0.15],
     scale: [0.15, 0.24, 0.04],
     rotation: [0, 0, 0],
     opacity: 0.6,
@@ -309,7 +334,7 @@ export const MUSCLE_GROUPS = {
         sampleSetsReps: '3 sets x 15 reps',
       },
       {
-        name: 'Farmer\'s Carry',
+        name: "Farmer's Carry",
         type: 'Grip/Compound',
         equipment: 'Heavy dumbbells or kettlebells',
         cues: 'Neutral spine, steady walk, strong grip.',
