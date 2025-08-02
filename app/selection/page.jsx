@@ -1,9 +1,13 @@
 "use client";
-import React, { useRef, useEffect, Suspense, useState } from 'react';
-import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, useGLTF } from '@react-three/drei';
-import * as THREE from 'three';
-import { useRouter } from 'next/navigation';
+import React, { useRef, useEffect, Suspense, useState } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
+import { OrbitControls, useGLTF } from "@react-three/drei";
+import * as THREE from "three";
+import { useRouter } from "next/navigation";
+import { PDFDownloadLink, pdf } from "@react-pdf/renderer";
+import WorkoutPlanPDF from "@/components/pdf/WorkoutPlanPDF";
+import { saveAs } from "file-saver";
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
 function MuscleModel({ modelPath, isVisible }) {
   const { scene, error } = useGLTF(modelPath);
@@ -67,7 +71,7 @@ export default function SelectionPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const stored = localStorage.getItem('selectedMuscles');
+    const stored = localStorage.getItem("selectedMuscles");
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
@@ -77,16 +81,16 @@ export default function SelectionPage() {
         }
       } catch {}
     }
-    router.push('/');
+    router.push("/");
   }, [router]);
 
   const handleBack = () => {
-    router.push('/');
+    router.push("/");
   };
 
   const clearSelection = () => {
-    localStorage.removeItem('selectedMuscles');
-    router.push('/');
+    localStorage.removeItem("selectedMuscles");
+    router.push("/");
   };
 
   if (selectedMuscles.length === 0) {
@@ -110,7 +114,7 @@ export default function SelectionPage() {
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div
           className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse"
-          style={{ animationDelay: '2s' }}
+          style={{ animationDelay: "2s" }}
         ></div>
       </div>
 
@@ -123,7 +127,8 @@ export default function SelectionPage() {
               </h1>
               <p className="text-slate-300 text-lg">
                 {selectedMuscles.length} selected muscle
-                {selectedMuscles.length > 1 ? 's' : ''} • Detailed view & workouts
+                {selectedMuscles.length > 1 ? "s" : ""} • Detailed view &
+                workouts
               </p>
             </div>
             <div className="flex space-x-3">
@@ -137,8 +142,18 @@ export default function SelectionPage() {
                 onClick={handleBack}
                 className="backdrop-blur-xl bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 px-4 py-2 text-blue-200 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-105 flex items-center gap-2"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  />
                 </svg>
                 Back
               </button>
@@ -149,7 +164,10 @@ export default function SelectionPage() {
 
       <div className="flex-1 flex relative z-10">
         <div className="flex-1 relative">
-          <Canvas camera={{ position: [3, 1, 3], fov: 50 }} className="rounded-none">
+          <Canvas
+            camera={{ position: [3, 1, 3], fov: 50 }}
+            className="rounded-none"
+          >
             <CameraController />
             <ambientLight intensity={0.4} />
             <directionalLight position={[10, 10, 5]} intensity={1} castShadow />
@@ -225,7 +243,9 @@ export default function SelectionPage() {
         <div className="w-96 backdrop-blur-xl bg-white/5 border-l border-white/10 flex flex-col">
           <div className="border-b border-white/10">
             <div className="p-6">
-              <h2 className="text-xl font-bold text-white mb-2">Selected Muscles</h2>
+              <h2 className="text-xl font-bold text-white mb-2">
+                Selected Muscles
+              </h2>
               <p className="text-slate-300 text-sm">Click to view details</p>
             </div>
 
@@ -240,8 +260,8 @@ export default function SelectionPage() {
                     }}
                     className={`w-full flex items-center space-x-3 p-3 rounded-xl text-left transition-all duration-200 ${
                       activeTab === index
-                        ? 'bg-gradient-to-r from-blue-500/30 to-purple-500/30 text-white border border-blue-400/30 shadow-lg'
-                        : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white border border-transparent'
+                        ? "bg-gradient-to-r from-blue-500/30 to-purple-500/30 text-white border border-blue-400/30 shadow-lg"
+                        : "bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white border border-transparent"
                     }`}
                   >
                     <div
@@ -249,10 +269,12 @@ export default function SelectionPage() {
                       style={{ backgroundColor: muscle.color }}
                     />
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm truncate">{muscle.name}</div>
+                      <div className="font-medium text-sm truncate">
+                        {muscle.name}
+                      </div>
                       <div className="text-xs opacity-75">
                         {muscle.workouts?.length || 0} workout
-                        {(muscle.workouts?.length || 0) !== 1 ? 's' : ''}
+                        {(muscle.workouts?.length || 0) !== 1 ? "s" : ""}
                       </div>
                     </div>
                     <div className="text-xs opacity-50 bg-white/20 px-2 py-1 rounded-full">
@@ -267,7 +289,9 @@ export default function SelectionPage() {
           <div className="flex-1 overflow-y-auto">
             {currentMuscle?.workouts && currentMuscle.workouts.length > 0 ? (
               <div className="p-6">
-                <h3 className="text-lg font-bold text-white mb-4">Recommended Workouts</h3>
+                <h3 className="text-lg font-bold text-white mb-4">
+                  Recommended Workouts
+                </h3>
 
                 <div className="flex gap-2 mb-4 overflow-x-auto">
                   {currentMuscle.workouts.map((workout, index) => (
@@ -276,8 +300,8 @@ export default function SelectionPage() {
                       onClick={() => setSelectedWorkout(index)}
                       className={`flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                         selectedWorkout === index
-                          ? 'bg-gradient-to-r from-green-500/30 to-teal-500/30 text-white border border-green-400/30'
-                          : 'bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white'
+                          ? "bg-gradient-to-r from-green-500/30 to-teal-500/30 text-white border border-green-400/30"
+                          : "bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white"
                       }`}
                     >
                       {workout.name}
@@ -299,9 +323,9 @@ export default function SelectionPage() {
                           </span>
                           <span
                             className={`inline-block px-2 py-1 rounded-lg text-xs font-medium ${
-                              currentWorkout.type === 'Compound'
-                                ? 'bg-orange-500/20 text-orange-200'
-                                : 'bg-blue-500/20 text-blue-200'
+                              currentWorkout.type === "Compound"
+                                ? "bg-orange-500/20 text-orange-200"
+                                : "bg-blue-500/20 text-blue-200"
                             }`}
                           >
                             {currentWorkout.type}
@@ -351,27 +375,25 @@ export default function SelectionPage() {
 
           <div className="p-6 border-t border-white/10">
             <button
-              onClick={() => {
-                const exportData = {
-                  muscles: selectedMuscles,
-                  exportDate: new Date().toISOString(),
-                  totalCount: selectedMuscles.length,
-                };
-                const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-                  type: 'application/json',
-                });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'selected-muscles.json';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+              onClick={async () => {
+                const blob = await pdf(
+                  <WorkoutPlanPDF
+                    exportDate={new Date().toISOString()}
+                    muscles={selectedMuscles}
+                    totalCount={selectedMuscles.length}
+                  />
+                ).toBlob();
+
+                saveAs(blob, "workout-plan.pdf");
               }}
               className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-500 hover:to-teal-500 px-4 py-3 text-white rounded-xl text-sm font-bold transition-all duration-200 hover:scale-105 shadow-lg flex items-center justify-center gap-2"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
