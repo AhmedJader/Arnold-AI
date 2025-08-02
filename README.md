@@ -1,16 +1,16 @@
 <p align="center">
-  <img width="1280" height="720" alt="TinyChoices Preview" src="https://yourdomain.com/tinychoices-preview.png" />
+  <img width="1280" height="720" alt="ARNOLD Preview" src="https://yourdomain.com/arnold-preview.png" />
 </p>
 
-<h1 align="center">TinyChoices</h1>
+<h1 align="center">ARNOLD</h1>
 
 <p align="center">
-  <a href="https://tinychoices.vercel.app/" target="_blank"><strong>🚀 LIVE DEMO</strong></a>
+  <a href="https://arnold-ai.vercel.app/" target="_blank"><strong>💪 LIVE DEMO</strong></a>
 </p>
 
 <p align="center">
   <strong>
-    TinyChoices is a 3D pediatric health simulator that shows how small daily decisions—like meals, snacks, and screen time—shape a child’s long-term health outcomes.
+    ARNOLD is your AI-powered fitness companion—featuring interactive 3D anatomy, personalized workouts, smart calendar syncing, and real-time voice coaching to keep you on track.
   </strong>
 </p>
 
@@ -20,54 +20,57 @@
 
 ---
 
-## 🎯 Why TinyChoices?
+## 🎯 Why ARNOLD?
 
-> 1 in 5 children globally are overweight or obese.  
-> Yet most families and providers lack **clear, visual tools** to demonstrate how everyday choices affect long-term health.
+> 80% of people abandon their fitness goals due to inconsistent plans, poor tracking, and low motivation.
 
-**TinyChoices bridges this gap** with a gamified, 3D simulation where every lifestyle choice updates an avatar’s:
-- 👶 Appearance & mood
-- 📈 BMI percentile
-- 🧠 Energy & health risk score
+**ARNOLD is built to solve that** by combining:
+- 🎯 Visual, muscle-targeted planning via 3D anatomy
+- 🧠 Custom AI-generated training plans
+- 📅 Auto-scheduled workouts in your calendar
+- 📞 Personalized coaching via real-time Twilio calls
 
 ---
 
-## 🧠 Core Features
+## 🧠 Features at a Glance
 
 | Feature | Description |
 |--------|-------------|
-| 🧍‍♂️ 3D Child Avatar | Avatar grows, gains weight, or changes mood based on decisions |
-| 🥗 Nutrition Choices | Choose meals/snacks and see caloric & health impacts |
-| 🛌 Lifestyle Sim | Sleep & activity tracking affects energy and outcomes |
-| 📊 Real-Time Health Metrics | Tracks BMI percentile, glucose risk, and wellness score |
-| 🔁 Scenario Mode | Compare two different lifestyles over time |
+| 🧍‍♂️ **3D Muscular Avatar** | Select muscles directly on a realistic 3D model |
+| 🏋️‍♂️ **AI-Powered Workouts** | Custom plans based on your anatomy selection and goals |
+| 📆 **Calendar Sync** | Schedule workouts directly into Google or Apple Calendar |
+| 📞 **Live Coaching via Twilio** | Get voice call motivation and instructions from your AI coach |
+| 📊 **Progress Tracking** | Visual insights into muscle group focus and performance trends |
 
 ---
 
-## 💡 Backed by Evidence
+## 🏗 Powered By Real Science
 
-- **CDC BMI-for-age percentiles**
-- **USDA MyPlate nutrition guidelines**
-- **AAP screen time and sleep recommendations**
+ARNOLD is backed by:
+- **ACSM & NSCA Training Guidelines**
+- **Progressive Overload Models**
+- **Evidence-Based Periodization Principles**
 
-We translate real-world pediatric health guidelines into a visual, interactive experience.
+Plus, real-time adaptability using OpenAI's intelligence engine.
 
 ---
 
 ## 🚀 Tech Stack
 
-- **Next.js 14** (App Router)
-- **Three.js** (for 3D avatar rendering)
-- **TailwindCSS v4** (utility-first styling)
-- **TypeScript** (strong types for scalable logic)
-- **OpenAI (optional)** – for in-app guidance or explanation
+- **Next.js 14** – App Router & SSR
+- **Three.js** – Interactive 3D muscle rendering
+- **TailwindCSS v4** – Utility-first UI styling
+- **TypeScript** – Strong typings for scalable logic
+- **OpenAI API** – Personalized AI workout generation
+- **Twilio API** – Real-time voice coaching
+- **Google Calendar API** – Smart workout scheduling
 
 ---
 
-## 🛠 Local Setup
+## 🛠 Getting Started Locally
 
 ```bash
-git clone https://github.com/yourname/tinychoices.git
-cd tinychoices
+git clone https://github.com/yourname/arnold.git
+cd arnold
 npm install
 npm run dev
