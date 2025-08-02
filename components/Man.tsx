@@ -106,6 +106,22 @@ const MUSCLE_GROUPS = {
     rotation: [0, 0, 0] as [number, number, number],
     opacity: 0.6,
   },
+  forearm_right: {
+    name: 'Right Forearm',
+    color: '#44ffff',
+    position: [-0.48, 0.26, 0.04] as [number, number, number],
+    scale: [0.11,0.07, 0.07] as [number, number, number],
+    rotation: [0, 0, 0] as [number, number, number],
+    opacity: 0.6,
+  },
+  forearm_left: {
+    name: 'Left forearm',
+    color: '#44ffff',
+    position: [0.48, 0.26, 0.04] as [number, number, number],
+    scale: [0.11,0.07, 0.07] as [number, number, number],
+    rotation: [0, 0, 0] as [number, number, number],
+    opacity: 0.6,
+  },
 } satisfies Record<string, MuscleConfig>;
 
 // Ensure type safety for dynamic keys
