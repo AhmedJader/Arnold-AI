@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="1280" height="720" alt="ARNOLD Preview" src="https://yourdomain.com/arnold-preview.png" />
+  <img width="1280" height="720" alt="ARNOLD Preview" src="/favicon.ico" />
 </p>
 
 <h1 align="center">ARNOLD</h1>
@@ -40,7 +40,7 @@
 | 🏋️‍♂️ **AI-Powered Workouts** | Custom plans based on your anatomy selection and goals |
 | 📆 **Calendar Sync** | Schedule workouts directly into Google or Apple Calendar |
 | 📞 **Live Coaching via Twilio** | Get voice call motivation and instructions from your AI coach |
-| 📊 **Progress Tracking** | Visual insights into muscle group focus and performance trends |
+| 📊 **Progress Tracking** | Visual insights into muscle group focus |
 
 ---
 
@@ -51,7 +51,7 @@ ARNOLD is backed by:
 - **Progressive Overload Models**
 - **Evidence-Based Periodization Principles**
 
-Plus, real-time adaptability using OpenAI's intelligence engine.
+Plus, real-time adaptability using GeminiAI's intelligence engine.
 
 ---
 
@@ -61,16 +61,7 @@ Plus, real-time adaptability using OpenAI's intelligence engine.
 - **Three.js** – Interactive 3D muscle rendering
 - **TailwindCSS v4** – Utility-first UI styling
 - **TypeScript** – Strong typings for scalable logic
-- **OpenAI API** – Personalized AI workout generation
+- **GeminiAI API** – Personalized AI workout generation
 - **Twilio API** – Real-time voice coaching
 - **Google Calendar API** – Smart workout scheduling
 
----
-
-## 🛠 Getting Started Locally
-
-```bash
-git clone https://github.com/yourname/arnold.git
-cd arnold
-npm install
-npm run dev
