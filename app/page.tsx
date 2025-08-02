@@ -1,34 +1,37 @@
+// app/page.tsx (Next.js 14+ App Router)
 "use client";
 
-import React from 'react';
-import Man from '../components/Man';
+import dynamic from "next/dynamic";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
-export default function HomePage() {
+// Dynamically import the 3D component to avoid SSR issues
+const AvatarScene = dynamic(() => import("@/components/AvatarScene"), {
+  ssr: false,
+  loading: () => <p className="text-center mt-10">Loading 3D Avatar...</p>,
+});
+
+
+export default function Home() {
+  const [showOverlay, setShowOverlay] = useState(true);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-900 via-blue-900 to-purple-900">
-      {/* Header */}
-      <header className="relative z-10 p-6">
-        <nav className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-white">
-            3D Muscle Anatomy
-          </h1>
-          <div className="space-x-6 text-white">
-            <button className="hover:text-blue-300 transition-colors">About</button>
-            <button className="hover:text-blue-300 transition-colors">Features</button>
-            <button className="hover:text-blue-300 transition-colors">Contact</button>
-          </div>
-        </nav>
-      </header>
+    <div className="relative w-full h-screen overflow-hidden bg-black">
+      {/* 3D Canvas */}
+      <AvatarScene />
 
-      {/* Main Content */}
-      <main className="relative h-[calc(100vh-120px)]">
-        <Man />
-      </main>
-
-      {/* Footer */}
-      <footer className="relative z-10 bg-black bg-opacity-50 text-black text-center py-6">
-        <p>&copy; 2025 3D Muscle Anatomy. Interactive learning made simple.</p>
-      </footer>
+      {/* Overlay content */}
+      {showOverlay && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-white bg-black/40">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">Welcome to TinyChoices</h1>
+          <p className="text-lg mb-8 text-center max-w-md">
+            Guide your child avatar through tiny daily choices to shape a healthier future.
+          </p>
+          <Button size="lg" onClick={() => setShowOverlay(false)}>
+            Start Simulation →
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
