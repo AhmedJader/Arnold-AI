@@ -1,14 +1,12 @@
 //app/page.jsx
 
-
 "use client";
-import React, { useRef, useEffect, Suspense, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, useGLTF } from '@react-three/drei';
-import * as THREE from 'three';
-import { useRouter } from 'next/navigation';
+import React, { useRef, useEffect, Suspense, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, useGLTF } from "@react-three/drei";
+import * as THREE from "three";
+import { useRouter } from "next/navigation";
 import { MUSCLE_GROUPS } from "@/lib/constants/muscleGroups";
-
 
 function SelectableMuscleMesh({ muscleKey, config, isSelected, onSelect }) {
   const meshRef = useRef();
@@ -42,22 +40,22 @@ function SelectableMuscleMesh({ muscleKey, config, isSelected, onSelect }) {
       onPointerEnter={(e) => {
         e.stopPropagation();
         setHovered(true);
-        document.body.style.cursor = 'pointer';
+        document.body.style.cursor = "pointer";
       }}
       onPointerLeave={(e) => {
         e.stopPropagation();
         setHovered(false);
-        document.body.style.cursor = 'default';
+        document.body.style.cursor = "default";
       }}
     >
       <sphereGeometry args={[1, 16, 16]} />
       <meshStandardMaterial
-        color={isSelected ? '#ffffff' : hovered ? '#ffcc00' : config.color}
+        color={isSelected ? "#ffffff" : hovered ? "#ffcc00" : config.color}
         transparent
         opacity={isSelected ? 0.9 : hovered ? 0.8 : config.opacity}
         roughness={0.3}
         metalness={0.1}
-        emissive={isSelected ? config.color : hovered ? '#444400' : '#000000'}
+        emissive={isSelected ? config.color : hovered ? "#444400" : "#000000"}
         emissiveIntensity={isSelected ? 0.3 : hovered ? 0.2 : 0}
       />
     </mesh>
@@ -65,7 +63,7 @@ function SelectableMuscleMesh({ muscleKey, config, isSelected, onSelect }) {
 }
 
 function ManModel({ selectedMuscles, onMuscleSelect }) {
-  const { scene } = useGLTF('/3D/Man.glb');
+  const { scene } = useGLTF("/3D/Man.glb");
   const modelRef = useRef();
 
   useEffect(() => {
@@ -78,7 +76,7 @@ function ManModel({ selectedMuscles, onMuscleSelect }) {
 
       scene.scale.setScalar(scale);
       scene.position.copy(center).multiplyScalar(-scale);
-      scene.position.y -= size.y * scale / 2;
+      scene.position.y -= (size.y * scale) / 2;
 
       modelRef.current.add(scene);
     }
@@ -130,7 +128,7 @@ export default function MainPage() {
   const router = useRouter();
 
   const handleMuscleSelect = (muscleKey) => {
-    setSelectedMuscles(prev => {
+    setSelectedMuscles((prev) => {
       const newSet = new Set(prev);
       newSet.has(muscleKey) ? newSet.delete(muscleKey) : newSet.add(muscleKey);
       return newSet;
@@ -138,37 +136,49 @@ export default function MainPage() {
   };
 
   const handleNext = () => {
-    const selectedData = Array.from(selectedMuscles).map(key => ({
+    const selectedData = Array.from(selectedMuscles).map((key) => ({
       key,
-      ...MUSCLE_GROUPS[key]
+      ...MUSCLE_GROUPS[key],
     }));
-    localStorage.setItem('selectedMuscles', JSON.stringify(selectedData));
-    router.push('/selection');
+    localStorage.setItem("selectedMuscles", JSON.stringify(selectedData));
+    router.push("/selection");
   };
 
   const clearAll = () => setSelectedMuscles(new Set());
 
   if (!hasEntered) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center justify-center text-center px-6 relative overflow-hidden">
-        {/* Fancy background blobs */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -top-40 -left-40 animate-pulse" />
-          <div className="absolute w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-3xl -bottom-40 -right-40 animate-pulse" />
+      <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black text-white px-4">
+        {/* Sketchfab animation background */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <iframe
+            src="https://sketchfab.com/models/db7be21587804a32ab3a99e165c56e19/embed?autostart=1&transparent=1&ui_controls=0&ui_infos=0&ui_stop=0&ui_hint=0&ui_watermark=0&ui_inspector=0&ui_settings=0&ui_vr=0&ui_fullscreen=0&ui_annotations=0&ui_help=0&ui_logo=0&ui_sharing=0&ui_sidebar=0&ui_ar=0&ui_animations=0&ui_sound=0"
+            className="w-full h-full absolute inset-0 opacity-80 scale-120"
+            frameBorder="0"
+            allow="autoplay; fullscreen; xr-spatial-tracking"
+            mozallowfullscreen="true"
+            webkitallowfullscreen="true"
+          />
+
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
         </div>
 
-        <h1 className="text-5xl font-bold text-white drop-shadow-md animate-in fade-in slide-in-from-top mb-4">
-          Welcome to <span className="text-blue-400">FitAtlas</span>
-        </h1>
-        <p className="text-lg text-slate-300 mb-8 animate-in fade-in slide-in-from-bottom delay-200 max-w-xl">
-          Explore a fully interactive 3D muscle selector and get a personalized workout in seconds.
-        </p>
-        <button
-          onClick={() => setHasEntered(true)}
-          className="px-8 py-4 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-lg shadow-lg hover:scale-105 transition-all hover:cursor-pointer duration-300 animate-in ease-in-out fade-in slide-in-from-bottom delay-300"
-        >
-          Enter App
-        </button>
+        {/* Hero content */}
+        <div className="z-10 text-center max-w-2xl space-y-6">
+          <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-white via-blue-400 to-purple-400 text-transparent bg-clip-text drop-shadow-md">
+            Welcome to FitAtlas
+          </h1>
+          <p className="text-lg text-gray-300 font-light leading-relaxed">
+            An intelligent, interactive 3D muscle selector that builds workouts
+            in seconds.
+          </p>
+          <button
+            onClick={() => setHasEntered(true)}
+            className="mt-6 inline-flex items-center justify-center px-8 py-4 rounded-full text-white font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 transition-transform hover:scale-105 shadow-xl"
+          >
+            Enter App
+          </button>
+        </div>
       </div>
     );
   }
@@ -193,29 +203,39 @@ export default function MainPage() {
             </p>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold text-white mb-1">{selectedMuscles.size}</div>
-            <div className="text-sm text-slate-400 uppercase tracking-wider">Selected</div>
+            <div className="text-3xl font-bold text-white mb-1">
+              {selectedMuscles.size}
+            </div>
+            <div className="text-sm text-slate-400 uppercase tracking-wider">
+              Selected
+            </div>
           </div>
         </div>
       </div>
 
       {/* Canvas */}
       <div className="flex-1 relative">
-        <Canvas camera={{ position: [3, 1, 3], fov: 50 }} className="rounded-none">
+        <Canvas
+          camera={{ position: [3, 1, 3], fov: 50 }}
+          className="rounded-none"
+        >
           <CameraController />
           <ambientLight intensity={0.4} />
           <directionalLight position={[10, 10, 5]} intensity={1} />
           <pointLight position={[-10, -10, -5]} intensity={0.5} />
           <spotLight position={[0, 10, 0]} intensity={0.3} />
           <Suspense fallback={<LoadingFallback />}>
-            <ManModel 
+            <ManModel
               selectedMuscles={selectedMuscles}
               onMuscleSelect={handleMuscleSelect}
             />
           </Suspense>
-          <OrbitControls 
-            enablePan enableZoom enableRotate 
-            minDistance={1} maxDistance={10}
+          <OrbitControls
+            enablePan
+            enableZoom
+            enableRotate
+            minDistance={1}
+            maxDistance={10}
           />
         </Canvas>
 
@@ -224,23 +244,37 @@ export default function MainPage() {
           <div className="absolute top-6 left-6 backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 max-w-sm shadow-2xl animate-in slide-in-from-left duration-500">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-white text-lg">How to Use</h3>
-              <button 
+              <button
                 onClick={() => setShowInstructions(false)}
                 className="text-slate-400 hover:text-white transition-colors p-1"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
             <div className="space-y-3 text-slate-200">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-blue-400 rounded-full" />
-                <span className="text-sm">Click colored areas to select muscles</span>
+                <span className="text-sm">
+                  Click colored areas to select muscles
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-green-400 rounded-full" />
-                <span className="text-sm">Selected muscles pulse and turn white</span>
+                <span className="text-sm">
+                  Selected muscles pulse and turn white
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-purple-400 rounded-full" />
@@ -252,23 +286,43 @@ export default function MainPage() {
 
         {/* Quick Actions */}
         <div className="absolute top-6 right-6 flex flex-col gap-3">
-          <button 
+          <button
             onClick={() => setShowInstructions(!showInstructions)}
             className="backdrop-blur-xl bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl p-3 text-white transition-all duration-200 hover:scale-105 shadow-lg"
             title="Toggle Instructions"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </button>
           {selectedMuscles.size > 0 && (
-            <button 
+            <button
               onClick={clearAll}
               className="backdrop-blur-xl bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 rounded-xl p-3 text-red-200 transition-all duration-200 hover:scale-105 shadow-lg"
               title="Clear All"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
               </svg>
             </button>
           )}
@@ -287,16 +341,34 @@ export default function MainPage() {
             </h3>
             {selectedMuscles.size > 0 ? (
               <div className="flex flex-wrap gap-2 max-h-20 overflow-y-auto">
-                {Array.from(selectedMuscles).map(key => (
-                  <div key={key} className="group backdrop-blur-sm bg-white/10 hover:bg-white/20 border border-white/20 rounded-full px-4 py-2 flex items-center gap-2 transition-all duration-200 hover:scale-105">
-                    <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: MUSCLE_GROUPS[key].color }} />
-                    <span className="text-white text-sm font-medium">{MUSCLE_GROUPS[key].name}</span>
+                {Array.from(selectedMuscles).map((key) => (
+                  <div
+                    key={key}
+                    className="group backdrop-blur-sm bg-white/10 hover:bg-white/20 border border-white/20 rounded-full px-4 py-2 flex items-center gap-2 transition-all duration-200 hover:scale-105"
+                  >
+                    <div
+                      className="w-3 h-3 rounded-full shadow-sm"
+                      style={{ backgroundColor: MUSCLE_GROUPS[key].color }}
+                    />
+                    <span className="text-white text-sm font-medium">
+                      {MUSCLE_GROUPS[key].name}
+                    </span>
                     <button
                       onClick={() => handleMuscleSelect(key)}
                       className="text-slate-400 hover:text-red-400 transition-colors ml-1 opacity-0 group-hover:opacity-100"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -317,9 +389,21 @@ export default function MainPage() {
             >
               <div className="flex items-center gap-3">
                 <span>Continue</span>
-                <div className="bg-white/20 rounded-full px-2 py-1 text-sm">{selectedMuscles.size}</div>
-                <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                <div className="bg-white/20 rounded-full px-2 py-1 text-sm">
+                  {selectedMuscles.size}
+                </div>
+                <svg
+                  className="w-5 h-5 transition-transform group-hover:translate-x-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
                 </svg>
               </div>
               <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
