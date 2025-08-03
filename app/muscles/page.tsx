@@ -150,6 +150,31 @@ function CameraController() {
   return null;
 }
 
+async function fetchMuscleSummary(muscleName: string): Promise<string> {
+  const res = await fetch("/api/muscle-info", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ muscleNames: [muscleName] }),
+  });
+
+  if (!res.ok) throw new Error("Failed to fetch muscle info");
+
+  const reader = res.body?.getReader();
+  const decoder = new TextDecoder("utf-8");
+  let fullText = "";
+
+  if (!reader) return "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    fullText += decoder.decode(value, { stream: true });
+  }
+
+  return fullText.trim();
+}
+
+
 export default function MuscleSelectorPage() {
   const [activePopupKey, setActivePopupKey] = useState<string | null>(null);
 
@@ -159,17 +184,35 @@ export default function MuscleSelectorPage() {
   const [showInstructions, setShowInstructions] = useState(true);
   const router = useRouter();
 
-  const handleMuscleSelect = (muscleKey: string) => {
-    setSelectedMuscles((prev) => {
-      const newSet = new Set(prev);
-      newSet.has(muscleKey) ? newSet.delete(muscleKey) : newSet.add(muscleKey);
-      return newSet;
+  const handleMuscleSelect = async (muscleKey: string) => {
+  setSelectedMuscles((prev) => {
+    const newSet = new Set(prev);
+    newSet.has(muscleKey) ? newSet.delete(muscleKey) : newSet.add(muscleKey);
+    return newSet;
+  });
+
+  // If already cached, open popup
+  if (aiSummaries[muscleKey]) {
+    setActivePopupKey(muscleKey);
+    return;
+  }
+
+  // Otherwise, fetch it
+  try {
+    const summary = await fetchMuscleSummary(muscleKey);
+
+    setAiSummaries((prev) => {
+      const updated = { ...prev, [muscleKey]: summary };
+      localStorage.setItem("aiSummaries", JSON.stringify(updated));
+      return updated;
     });
 
-    if (aiSummaries[muscleKey]) {
-      setActivePopupKey(muscleKey); // open popup if already fetched
-    }
-  };
+    setActivePopupKey(muscleKey);
+  } catch (err) {
+    console.error("❌ Failed to fetch summary for", muscleKey, err);
+  }
+};
+
 
   useEffect(() => {
     const cached = localStorage.getItem("aiSummaries");
@@ -388,24 +431,7 @@ export default function MuscleSelectorPage() {
                   </motion.div>
                 ))}
                 {/* AI Summaries */}
-                {selectedMuscles.size > 0 && (
-                  <div className="mt-6">
-                    <MuscleInsights
-                      muscleKeys={Array.from(selectedMuscles)}
-                      onUpdate={(summaries) => {
-                        setAiSummaries((prev) => {
-                          const updated = { ...prev, ...summaries };
-                          localStorage.setItem("aiSummaries", JSON.stringify(updated));
-                          return updated;
-                        });
-
-                        const firstKey = Object.keys(summaries)[0];
-                        if (firstKey) setActivePopupKey(firstKey);
-                      }}
-
-                    />
-                  </div>
-                )}
+                
 
               </motion.div>
             ) : (
