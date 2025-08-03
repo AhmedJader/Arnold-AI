@@ -40,7 +40,7 @@ export default function LandingPage(): React.JSX.Element {
         {/* Login Button */}
         <button
           onClick={handleLogin}
-          className="px-6 py-2.5 text-xs font-medium text-white/90 hover:text-white transition-all duration-300 hover:scale-105 backdrop-blur-sm border border-white/10 hover:border-white/20 rounded-full bg-white/5 hover:bg-white/10"
+          className="px-6 hover:cursor-pointer py-2.5 text-xs font-medium text-white/90 hover:text-white transition-all duration-300 hover:scale-105 backdrop-blur-sm border border-white/10 hover:border-white/20 rounded-full bg-white/5 hover:bg-white/10"
         >
           Login
         </button>
@@ -48,7 +48,7 @@ export default function LandingPage(): React.JSX.Element {
         {/* Signup Button */}
         <button
           onClick={handleSignup}
-          className="px-6 py-2.5 text-xs font-medium text-white bg-gradient-to-r from-gray-600/80 to-neutral-600/80 hover:from-neutral-600/80 hover:to-neutral-600 transition-all duration-300 hover:scale-105 backdrop-blur-sm rounded-full border border-white/10 hover:border-white/20 shadow-lg hover:shadow-xl"
+          className="px-6 hover:cursor-pointer py-2.5 text-xs font-medium text-white bg-gradient-to-r from-gray-600/80 to-neutral-600/80 hover:from-neutral-600/80 hover:to-neutral-600 transition-all duration-300 hover:scale-105 backdrop-blur-sm rounded-full border border-white/10 hover:border-white/20 shadow-lg hover:shadow-xl"
         >
           Sign Up
         </button>
@@ -114,7 +114,7 @@ export default function LandingPage(): React.JSX.Element {
             delay: 0.5 
           }}
           onClick={() => router.push("/muscles")}
-          className="mt-8 inline-flex items-center justify-center px-10 py-4 rounded-full text-white font-medium bg-black/60 hover:bg-black/80 transition-all duration-300 hover:scale-105 shadow-2xl backdrop-blur-lg border border-white/10 hover:border-white/20 pointer-events-auto group"
+          className="mt-8 inline-flex items-center justify-center px-10 py-4 rounded-full text-white font-medium bg-black/60 hover:bg-black/80 hover:cursor-pointer transition-all duration-300 hover:scale-105 shadow-2xl backdrop-blur-lg border border-white/10 hover:border-white/20 pointer-events-auto group"
         >
           <span className="relative z-10">Next</span>
           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-neutral-800/50 to-neutral-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -132,7 +132,7 @@ export default function LandingPage(): React.JSX.Element {
         }}
         className="relative z-50 pb-6 text-center pointer-events-none"
       >
-        <p className="text-xs sm:text-base bg-clip-text text-transparent bg-gradient-to-b from-neutral-300 to-neutral-600">
+        <p className="text-xs animate-pulse sm:text-base bg-clip-text text-transparent bg-gradient-to-b from-neutral-300 to-neutral-600">
           Terrahacks 2025 - By Omid Latifi & Ahmed Abduljader
         </p>
       </motion.footer>
