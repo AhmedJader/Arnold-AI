@@ -9,6 +9,8 @@ import HeaderBar from "@/components/SelectionPage/HeaderBar";
 import ExportButton from "@/components/SelectionPage/ExportButton";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import { MUSCLE_GROUPS } from "@/lib/constants/muscleGroups";
+import AddWorkoutToCalendar from "@/components/AddWorkoutToCalendar";
+
 
 interface Workout {
   name: string;
@@ -140,6 +142,8 @@ export default function SelectionPage(): React.JSX.Element {
         handleBack={handleBack}
         clearSelection={clearSelection}
       />
+
+
       <div className="flex-1 flex relative z-10">
         <MuscleCanvas selectedMuscles={selectedMuscles} activeTab={activeTab} />
         <div className="w-96 backdrop-blur-xl bg-gray-900/20 border-l border-gray-700/30 flex flex-col">
@@ -163,6 +167,21 @@ export default function SelectionPage(): React.JSX.Element {
               {ttsLoading ? "Generating tips..." : `🎧 Form Tips for ${currentMuscle.name}`}
             </button>
           )}
+          <div className="p-8">
+            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-md space-y-4 max-w-md">
+              <h1 className="text-xl font-bold text-white">Your Workout Plan</h1>
+              <AddWorkoutToCalendar
+                muscleName="Full Arnold Plan"
+                workouts={selectedMuscles.flatMap(muscle =>
+                  muscle.workouts.map(({ name, cues }) => ({
+                    name: `${muscle.name} - ${name}`,
+                    cues,
+                  }))
+                )}
+              />
+            </div>
+          </div>
+
           <div className="p-6 border-t border-gray-700/30">
             <ExportButton selectedMuscles={musclesForExport} />
           </div>

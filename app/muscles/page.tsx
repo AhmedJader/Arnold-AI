@@ -11,7 +11,6 @@ import { MUSCLE_GROUPS } from "@/lib/constants/muscleGroups";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import MuscleInsights from "@/components/MuscleInsights";
 import MuscleInsightsPopup from "@/components/MuscleInsightsPopup";
-import AddWorkoutToCalendar from "@/components/AddWorkoutToCalendar";
 
 interface MuscleConfig {
   color: string;
@@ -252,10 +251,6 @@ export default function MuscleSelectorPage() {
         className="relative z-50 backdrop-blur-2xl bg-black/30 border-b border-white/10 px-6 py-8"
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="p-8">
-            <h1 className="text-2xl font-bold text-white mb-4">Your Workout Plan</h1>
-            <AddWorkoutToCalendar />
-          </div>
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent pb-6">
               Select Muscle Groups
