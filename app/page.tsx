@@ -101,7 +101,7 @@ export default function LandingPage(): React.JSX.Element {
           }}
           className="text-lg sm:text-xl text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-500"
         >
-          Your Fitness Companion
+          Your Fitness & Physical Rehabilitation Companion
         </motion.p>
 
         {/* Next Button */}
