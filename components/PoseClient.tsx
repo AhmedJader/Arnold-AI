@@ -13,7 +13,10 @@ export default function PoseClient() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [feedback, setFeedback] = useState("");
   const [audio, setAudio] = useState("");
+
   const poseLandmarkerRef = useRef<PoseLandmarker | null>(null);
+  const lastSentPoseRef = useRef<string | null>(null);
+  const lastSentTimeRef = useRef<number>(0);
 
   useEffect(() => {
     let interval: number;
@@ -45,7 +48,10 @@ export default function PoseClient() {
         if (!videoRef.current || !poseLandmarkerRef.current) return;
 
         const video = videoRef.current;
-        const results = await poseLandmarkerRef.current.detectForVideo(video, performance.now());
+        const results = await poseLandmarkerRef.current.detectForVideo(
+          video,
+          performance.now()
+        );
 
         canvasCtx.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
         canvasCtx.drawImage(video, 0, 0, canvasRef.current!.width, canvasRef.current!.height);
@@ -61,6 +67,23 @@ export default function PoseClient() {
             name: "",
           }));
 
+          // ---- Deduplication and throttling logic ----
+          const now = Date.now();
+          const poseSignature = JSON.stringify(
+            keypoints.map((k) => ({
+              x: parseFloat(k.x.toFixed(2)),
+              y: parseFloat(k.y.toFixed(2)),
+            }))
+          );
+
+          const poseChanged = poseSignature !== lastSentPoseRef.current;
+          const cooldownPassed = now - lastSentTimeRef.current > 12000;
+
+          if (!poseChanged || !cooldownPassed) return;
+
+          lastSentPoseRef.current = poseSignature;
+          lastSentTimeRef.current = now;
+
           const res = await fetch("/api/rehab-feedback", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -71,7 +94,7 @@ export default function PoseClient() {
           setFeedback(data.feedback || "");
           setAudio(data.base64Audio || "");
         }
-      }, 3000);
+      }, 2000); // Evaluate every 2 seconds
     };
 
     runPoseDetection();
