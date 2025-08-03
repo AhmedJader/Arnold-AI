@@ -10,6 +10,7 @@ import WorkoutDetailPanel from "@/components/SelectionPage/WorkoutDetailPanel";
 import HeaderBar from "@/components/SelectionPage/HeaderBar";
 import ExportButton from "@/components/SelectionPage/ExportButton";
 import { Spotlight } from "@/components/ui/spotlight-new";
+import { MUSCLE_GROUPS } from "@/lib/constants/muscleGroups";
 
 // Type definitions matching ExportButton's expected interface
 interface Workout {
@@ -39,6 +40,24 @@ interface ExtendedMuscle extends Muscle {
   // Add other properties you might need internally
 }
 
+async function playFormTipsForMuscle(muscleKey: string) {
+  const muscle = MUSCLE_GROUPS[muscleKey];
+  if (!muscle) return;
+
+  const res = await fetch("/api/muscle-workout-tts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      muscleName: muscle.name,
+      workouts: muscle.workouts.map(({ name, cues }) => ({ name, cues })),
+    }),
+  });
+
+  const { base64Audio } = await res.json();
+  const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`);
+  audio.play();
+}
+
 export default function SelectionPage(): React.JSX.Element {
   const [selectedMuscles, setSelectedMuscles] = useState<ExtendedMuscle[]>([]);
   const [activeTab, setActiveTab] = useState<number>(0);
@@ -47,25 +66,32 @@ export default function SelectionPage(): React.JSX.Element {
 
   const [ttsLoading, setTtsLoading] = useState(false);
 
-  const playWorkoutTTS = async (muscleName: string) => {
+  const playWorkoutTTS = async (muscle: ExtendedMuscle) => {
     setTtsLoading(true);
     try {
       const res = await fetch("/api/muscle-workout-tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ muscleName }),
+        body: JSON.stringify({
+          muscleName: muscle.name,
+          workouts: muscle.workouts.map(({ name, cues }) => ({ name, cues })),
+        }),
       });
 
-      const { base64Audio } = await res.json();
+      const { base64Audio, error } = await res.json();
+      if (error || !base64Audio) {
+        throw new Error(error || "No audio returned.");
+      }
+
       const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`);
       audio.play();
-
     } catch (err) {
       console.error("TTS Error:", err);
     } finally {
       setTtsLoading(false);
     }
   };
+
 
 
   useEffect(() => {
@@ -209,16 +235,17 @@ export default function SelectionPage(): React.JSX.Element {
             currentWorkout={currentWorkout}
           />
 
-          {/* TTS Button */}
+          {/* TTS Button: Reads all workout cues for selected muscle */}
           {currentMuscle && (
             <button
-              onClick={() => playWorkoutTTS(currentMuscle.name)}
+              onClick={() => playWorkoutTTS(currentMuscle)}
               disabled={ttsLoading}
-              className="mx-6 mt-4 mb-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded text-sm"
+              className="mx-6 mt-4 mb-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded text-sm font-medium shadow-lg transition"
             >
-              {ttsLoading ? "Generating audio..." : `🔊 Hear Workout Summary`}
+              {ttsLoading ? "Generating tips..." : `🎧 Form Tips for ${currentMuscle.name}`}
             </button>
           )}
+
 
 
           {/* Export Button Section - exact original structure */}
