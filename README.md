@@ -1,67 +1,78 @@
 <p align="center">
-  <img width="1280" height="720" alt="ARNOLD Preview" src="/favicon.ico" />
+  <img width="1280" height="720" alt="Arnold AI" src="public\arnold.png" />
 </p>
 
-<h1 align="center">ARNOLD</h1>
+<h1 align="center">Arnold AI</h1>
 
 <p align="center">
-  <a href="https://arnold-ai.vercel.app/" target="_blank"><strong>💪 LIVE DEMO</strong></a>
-</p>
-
-<p align="center">
-  <strong>
-    ARNOLD is your AI-powered fitness companion—featuring interactive 3D anatomy, personalized workouts, smart calendar syncing, and real-time voice coaching to keep you on track.
-  </strong>
+  <a href="https://arnold-ai.vercel.app/" target="_blank"><strong>🏋️‍♂️ VISIT THE DEMO</strong></a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Built%20With-Next.js%20%7C%20Three.js%20%7C%20Tailwind-blue?style=for-the-badge" alt="Tech Stack" />
+  <strong>Train smarter. Arnold AI is your fully interactive fitness assistant — combining a 3D muscle selector, Gemini-powered form feedback, and Google Calendar planning into one sleek web app.</strong>
+</p>
+
+<p align="center">
+
+  <!-- Deployed on Vercel -->
+  <a href="https://vercel.com/ahmedjader/arnold-ai">
+    <img src="https://img.shields.io/badge/Hosted%20on-Vercel-black?style=for-the-badge&logo=vercel" alt="Vercel Badge">
+  </a>
+
+  <!-- Gemini AI -->
+  <a href="#">
+    <img src="https://img.shields.io/badge/Gemini-LLM-blueviolet?style=for-the-badge&logo=google" alt="Gemini">
+  </a>
+
+  <!-- Google Calendar Integration -->
+  <a href="#">
+    <img src="https://img.shields.io/badge/Google%20Calendar-Integrated-34A853?style=for-the-badge&logo=googlecalendar" alt="Google Calendar">
+  </a>
+
 </p>
 
 ---
 
-## 🎯 Why ARNOLD?
+## 💪 Arnold AI – Intelligent Workout Planning
 
-> 80% of people abandon their fitness goals due to inconsistent plans, poor tracking, and low motivation.
+Arnold AI gives you the power to plan, visualize, and execute your fitness goals using real-time AI feedback and Google Calendar scheduling. Forget static routines. This is **adaptive**, **interactive**, and **AI-enhanced** fitness.
 
-**ARNOLD is built to solve that** by combining:
-- 🎯 Visual, muscle-targeted planning via 3D anatomy
-- 🧠 Custom AI-generated training plans
-- 📅 Auto-scheduled workouts in your calendar
-- 📞 Personalized coaching via real-time Twilio calls
+### 🔥 Features
 
----
-
-## 🧠 Features at a Glance
-
-| Feature | Description |
-|--------|-------------|
-| 🧍‍♂️ **3D Muscular Avatar** | Select muscles directly on a realistic 3D model |
-| 🏋️‍♂️ **AI-Powered Workouts** | Custom plans based on your anatomy selection and goals |
-| 📆 **Calendar Sync** | Schedule workouts directly into Google or Apple Calendar |
-| 📞 **Live Coaching via Twilio** | Get voice call motivation and instructions from your AI coach |
-| 📊 **Progress Tracking** | Visual insights into muscle group focus |
+- 🎯 **3D Muscle Selector** — Clickable, animated muscle map powered by Three.js.
+- 🧠 **Gemini LLM Coaching** — Get real-time form tips and technique breakdowns via natural language streaming.
+- 📅 **Google Calendar Integration** — Automatically generate recurring workouts across a 4-week plan.
+- 🔊 **Text-to-Speech (TTS) Form Feedback** — Generate and play audio cue cards dynamically.
+- 📤 **Exportable Plans** — One-click export of your full workout blueprint.
 
 ---
 
-## 🏗 Powered By Real Science
+## ⚙️ How It Works
 
-ARNOLD is backed by:
-- **ACSM & NSCA Training Guidelines**
-- **Progressive Overload Models**
-- **Evidence-Based Periodization Principles**
-
-Plus, real-time adaptability using GeminiAI's intelligence engine.
+- `@react-three/fiber` powers a fully interactive 3D body.
+- User-selected muscles are stored and linked to curated workouts.
+- Gemini generates detailed form tips per workout.
+- Google Calendar API creates recurring, personalized workout events.
+- TTS API converts tips to playable audio.
+- Everything deploys cleanly via Vercel serverless infra.
 
 ---
 
 ## 🚀 Tech Stack
 
-- **Next.js 14** – App Router & SSR
-- **Three.js** – Interactive 3D muscle rendering
-- **TailwindCSS v4** – Utility-first UI styling
-- **TypeScript** – Strong typings for scalable logic
-- **GeminiAI API** – Personalized AI workout generation
-- **Twilio API** – Real-time voice coaching
-- **Google Calendar API** – Smart workout scheduling
+| Tech               | Usage                                      |
+|--------------------|---------------------------------------------|
+| **Next.js 14**     | App framework (App Router, server actions) |
+| **TailwindCSS v4** | Full dark theme + responsive design        |
+| **Three.js**       | 3D model rendering via React Fiber          |
+| **Google APIs**    | Calendar + OAuth + TTS                     |
+| **OpenAI / Gemini**| Form feedback + summarization              |
+| **Vercel AI SDK**  | Streaming LLM integration                  |
 
+---
+
+## 🧪 Getting Started
+
+1. Clone this repo:  
+   ```bash
+   git clone https://github.com/ahmedjader/arnold-ai
