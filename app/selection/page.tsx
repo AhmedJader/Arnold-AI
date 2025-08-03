@@ -1,5 +1,3 @@
-// app/SelectionPage.tsx (With Spotlight - Original Layout Preserved)
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -11,12 +9,7 @@ import HeaderBar from "@/components/SelectionPage/HeaderBar";
 import ExportButton from "@/components/SelectionPage/ExportButton";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import { MUSCLE_GROUPS } from "@/lib/constants/muscleGroups";
-import { useGeminiStream } from "@/lib/hooks/useGeminiStream";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
-
-
-// Type definitions matching ExportButton's expected interface
 interface Workout {
   name: string;
   type: string;
@@ -32,65 +25,41 @@ interface Muscle {
   workouts: Workout[];
 }
 
-// Extended interfaces for internal use (if you need additional properties)
 interface ExtendedWorkout extends Workout {
   id?: string | number;
-  // Add other properties you might need internally
 }
 
 interface ExtendedMuscle extends Muscle {
   id?: string | number;
   workouts: ExtendedWorkout[];
-  // Add other properties you might need internally
-}
-
-async function playFormTipsForMuscle(muscleKey: string) {
-  const muscle = MUSCLE_GROUPS[muscleKey];
-  if (!muscle) return;
-
-  const res = await fetch("/api/muscle-workout-tts", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      muscleName: muscle.name,
-      workouts: muscle.workouts.map(({ name, cues }) => ({ name, cues })),
-    }),
-  });
-
-  const { base64Audio } = await res.json();
-  const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`);
-  audio.play();
 }
 
 export default function SelectionPage(): React.JSX.Element {
-  const { streamCues } = useGeminiStream(); // optional, for UI streaming if still needed
-  const [geminiTips, setGeminiTips] = useState<Record<string, string>>({});
-
-
   const [selectedMuscles, setSelectedMuscles] = useState<ExtendedMuscle[]>([]);
   const [activeTab, setActiveTab] = useState<number>(0);
   const [selectedWorkout, setSelectedWorkout] = useState<number>(0);
+  const [ttsLoading, setTtsLoading] = useState(false);
   const router = useRouter();
 
-  const [ttsLoading, setTtsLoading] = useState(false);
-
-  const generateTipsForMuscle = async (muscle: ExtendedMuscle) => {
-  const model = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY!).getGenerativeModel({
-    model: "gemini-2.5-flash-lite",
-  });
-
-  const tips: Record<string, string> = {};
-
-  for (const workout of muscle.workouts) {
-    const prompt = `Give 1 sentence, 10–20 words max, form-focused coaching tip for: ${workout.name}`;
-    const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
-    tips[workout.name] = text;
-  }
-
-  setGeminiTips(prev => ({ ...prev, ...tips }));
-};
-
+  useEffect(() => {
+    const stored = localStorage.getItem("selectedMuscles");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const processedMuscles = parsed.map(muscle => ({
+            ...muscle,
+            workouts: muscle.workouts || []
+          }));
+          setSelectedMuscles(processedMuscles);
+          return;
+        }
+      } catch (error) {
+        console.error("Error parsing stored muscles:", error);
+      }
+    }
+    router.push("/");
+  }, [router]);
 
   const playWorkoutTTS = async (muscle: ExtendedMuscle) => {
     setTtsLoading(true);
@@ -102,16 +71,13 @@ export default function SelectionPage(): React.JSX.Element {
           muscleName: muscle.name,
           workouts: muscle.workouts.map(({ name }) => ({
             name,
-            cues: geminiTips[name] || "", // fallback to empty string if not yet generated
+            cues: "", // let API generate cues internally
           }))
-
         }),
       });
 
       const { base64Audio, error } = await res.json();
-      if (error || !base64Audio) {
-        throw new Error(error || "No audio returned.");
-      }
+      if (error || !base64Audio) throw new Error(error || "No audio returned.");
 
       const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`);
       audio.play();
@@ -122,64 +88,7 @@ export default function SelectionPage(): React.JSX.Element {
     }
   };
 
-
-
-  useEffect(() => {
-    const stored = localStorage.getItem("selectedMuscles");
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          // Ensure workouts array exists and is not undefined
-          const processedMuscles = parsed.map(muscle => ({
-            ...muscle,
-            workouts: muscle.workouts || [] // Provide default empty array if undefined
-          }));
-          setSelectedMuscles(processedMuscles);
-          return;
-        }
-      } catch (error) {
-        console.error("Error parsing stored muscles:", error);
-      }
-    }
-    router.push("/");
-  }, [router]);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("selectedMuscles");
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const processedMuscles = parsed.map(muscle => ({
-            ...muscle,
-            workouts: muscle.workouts || [],
-          }));
-          setSelectedMuscles(processedMuscles);
-          Promise.all(processedMuscles.map(m => generateTipsForMuscle(m)));
-
-
-          // 👇 Fetch Gemini workout summaries
-          fetch("/api/muscle-workout-summary", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ muscleNames: processedMuscles.map(m => m.name) }),
-          })
-            .then(res => res.text())
-            .then(text => console.log("Workout Summaries:\n", text)); // TODO: store in state/UI
-
-          return;
-        }
-      } catch (error) {
-        console.error("Error parsing stored muscles:", error);
-      }
-    }
-    router.push("/");
-  }, [router]);
-
-
   const handleBack = (): void => router.push("/");
-
   const clearSelection = (): void => {
     localStorage.removeItem("selectedMuscles");
     router.push("/");
@@ -188,19 +97,13 @@ export default function SelectionPage(): React.JSX.Element {
   if (selectedMuscles.length === 0) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden">
-        {/* Animated Spotlight Background */}
         <Spotlight />
-
-        {/* Subtle overlay gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/40 pointer-events-none" />
-
         <div className="text-center text-white relative z-10">
-          {/* Modern loading spinner */}
           <div className="relative mx-auto mb-8 w-16 h-16">
             <div className="absolute inset-0 rounded-full border-2 border-gray-800"></div>
             <div className="absolute inset-0 rounded-full border-t-2 border-l-2 border-blue-500 animate-spin"></div>
           </div>
-
           <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
             Loading...
           </h2>
@@ -212,10 +115,9 @@ export default function SelectionPage(): React.JSX.Element {
     );
   }
 
-  const currentMuscle: ExtendedMuscle | undefined = selectedMuscles[activeTab];
-  const currentWorkout: ExtendedWorkout | undefined = currentMuscle?.workouts?.[selectedWorkout];
+  const currentMuscle = selectedMuscles[activeTab];
+  const currentWorkout = currentMuscle?.workouts?.[selectedWorkout];
 
-  // Convert ExtendedMuscle[] to Muscle[] for ExportButton
   const musclesForExport: Muscle[] = selectedMuscles.map(muscle => ({
     name: muscle.name,
     description: muscle.description,
@@ -225,51 +127,33 @@ export default function SelectionPage(): React.JSX.Element {
       type: workout.type,
       equipment: workout.equipment,
       sampleSetsReps: workout.sampleSetsReps,
-      cues: workout.cues
-    }))
+      cues: workout.cues,
+    })),
   }));
 
   return (
     <div className="min-h-screen bg-black flex flex-col relative overflow-hidden">
-      {/* Animated Spotlight Background */}
       <Spotlight />
-
-      {/* Subtle overlay gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/40 pointer-events-none" />
-
-      {/* Header Bar - keeping original functionality */}
       <HeaderBar
         selectedMuscles={selectedMuscles}
         handleBack={handleBack}
         clearSelection={clearSelection}
       />
-
-      {/* Main content area - EXACT original layout structure */}
       <div className="flex-1 flex relative z-10">
-        {/* 3D Canvas area - full width minus sidebar */}
-        <MuscleCanvas
-          selectedMuscles={selectedMuscles}
-          activeTab={activeTab}
-        />
-
-        {/* Right Sidebar - exact original width and structure */}
+        <MuscleCanvas selectedMuscles={selectedMuscles} activeTab={activeTab} />
         <div className="w-96 backdrop-blur-xl bg-gray-900/20 border-l border-gray-700/30 flex flex-col">
-          {/* Muscle Sidebar */}
           <MuscleSidebar
             selectedMuscles={selectedMuscles}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             setSelectedWorkout={setSelectedWorkout}
           />
-
-          {/* Workout Detail Panel */}
           <div className="overflow-y-auto flex-1 p-4 space-y-4">
             {currentMuscle?.workouts.map((workout, i) => (
               <WorkoutDetailPanel key={i} currentWorkout={workout} />
             ))}
           </div>
-
-          {/* TTS Button: Reads all workout cues for selected muscle */}
           {currentMuscle && (
             <button
               onClick={() => playWorkoutTTS(currentMuscle)}
@@ -279,33 +163,11 @@ export default function SelectionPage(): React.JSX.Element {
               {ttsLoading ? "Generating tips..." : `🎧 Form Tips for ${currentMuscle.name}`}
             </button>
           )}
-
-
-
-          {/* Export Button Section - exact original structure */}
           <div className="p-6 border-t border-gray-700/30">
             <ExportButton selectedMuscles={musclesForExport} />
           </div>
         </div>
       </div>
-
-      {/* Custom animations - minimal and non-intrusive */}
-      <style jsx>{`
-        @keyframes subtleFloat {
-          0%, 100% { 
-            transform: translateY(0px); 
-            opacity: 0.1;
-          }
-          50% { 
-            transform: translateY(-10px); 
-            opacity: 0.15;
-          }
-        }
-        
-        :global(.animate-subtle-float) {
-          animation: subtleFloat 12s ease-in-out infinite;
-        }
-      `}</style>
     </div>
   );
 }
