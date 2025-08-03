@@ -33,84 +33,96 @@ export default function PoseClient() {
     let interval: number;
 
     const runPoseDetection = async () => {
-      const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
-      );
-
-      poseLandmarkerRef.current = await PoseLandmarker.createFromOptions(vision, {
-        baseOptions: {
-          modelAssetPath:
-            "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task",
-        },
-        runningMode: "VIDEO",
-        numPoses: 1,
-      });
-
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => videoRef.current?.play();
-      }
-
-      interval = window.setInterval(async () => {
-        if (!videoRef.current || !poseLandmarkerRef.current) return;
-
-        const video = videoRef.current;
-        const results = await poseLandmarkerRef.current.detectForVideo(
-          video,
-          performance.now()
+      try {
+        const vision = await FilesetResolver.forVisionTasks(
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
         );
 
-        const canvas = canvasRef.current;
-        if (!canvas) return;
+        poseLandmarkerRef.current = await PoseLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath:
+              "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task",
+          },
+          runningMode: "VIDEO",
+          numPoses: 1,
+        });
 
-        // Match canvas size to video for accurate drawing
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const ctx = canvas.getContext("2d")!;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        if (results.landmarks.length > 0) {
-          const landmarks = results.landmarks[0];
-          const drawingUtils = new DrawingUtils(ctx);
-          drawingUtils.drawLandmarks(landmarks);
-          drawingUtils.drawConnectors(landmarks);
-
-          const keypoints = landmarks.map((kp, i) => ({
-            x: kp.x,
-            y: kp.y,
-            score: 1, // fallback since NormalizedLandmark has no score
-            name: KEYPOINT_NAMES[i] ?? `kp-${i}`,
-          }));
-
-          const now = Date.now();
-          const poseSignature = JSON.stringify(
-            keypoints.map((k) => ({
-              x: parseFloat(k.x.toFixed(2)),
-              y: parseFloat(k.y.toFixed(2)),
-            }))
-          );
-
-          const poseChanged = poseSignature !== lastSentPoseRef.current;
-          const cooldownPassed = now - lastSentTimeRef.current > 12000;
-
-          if (!poseChanged || !cooldownPassed) return;
-          lastSentPoseRef.current = poseSignature;
-          lastSentTimeRef.current = now;
-
-          const res = await fetch("/api/rehab-feedback", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ keypoints }),
-          });
-
-          const data = await res.json();
-          setFeedback(data.feedback || "");
-          setAudio(data.base64Audio || "");
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.onloadedmetadata = () => videoRef.current?.play();
         }
-      }, 2000);
+
+        interval = window.setInterval(async () => {
+          try {
+            if (!videoRef.current || !poseLandmarkerRef.current) return;
+
+            const video = videoRef.current;
+            const results = await poseLandmarkerRef.current.detectForVideo(
+              video,
+              performance.now()
+            );
+
+            const canvas = canvasRef.current;
+            if (!canvas) return;
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext("2d")!;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            if (results.landmarks.length > 0) {
+              const landmarks = results.landmarks[0];
+              const drawingUtils = new DrawingUtils(ctx);
+              drawingUtils.drawLandmarks(landmarks);
+              drawingUtils.drawConnectors(landmarks);
+
+              const keypoints = landmarks.map((kp, i) => ({
+                x: kp.x,
+                y: kp.y,
+                score: 1,
+                name: KEYPOINT_NAMES[i] ?? `kp-${i}`,
+              }));
+
+              const now = Date.now();
+              const poseSignature = JSON.stringify(
+                keypoints.map((k) => ({
+                  x: parseFloat(k.x.toFixed(2)),
+                  y: parseFloat(k.y.toFixed(2)),
+                }))
+              );
+
+              const poseChanged = poseSignature !== lastSentPoseRef.current;
+              const cooldownPassed = now - lastSentTimeRef.current > 12000;
+
+              if (!poseChanged || !cooldownPassed) return;
+              lastSentPoseRef.current = poseSignature;
+              lastSentTimeRef.current = now;
+
+              const res = await fetch("/api/rehab-feedback", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ keypoints }),
+              });
+
+              const data = await res.json();
+              setFeedback(data.feedback || "");
+              setAudio(data.base64Audio || "");
+            }
+          } catch (err) {
+            // prevent logging on known non-blocking fetch errors
+            if (process.env.NODE_ENV === "development") {
+              console.debug("Pose detection loop error (harmless):", err);
+            }
+          }
+        }, 2000);
+      } catch (err) {
+        if (process.env.NODE_ENV === "development") {
+          console.debug("Pose init error (non-blocking):", err);
+        }
+      }
     };
+
 
     runPoseDetection();
     return () => {
