@@ -11,6 +11,10 @@ import HeaderBar from "@/components/SelectionPage/HeaderBar";
 import ExportButton from "@/components/SelectionPage/ExportButton";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import { MUSCLE_GROUPS } from "@/lib/constants/muscleGroups";
+import { useGeminiStream } from "@/lib/hooks/useGeminiStream";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+
 
 // Type definitions matching ExportButton's expected interface
 interface Workout {
@@ -59,12 +63,34 @@ async function playFormTipsForMuscle(muscleKey: string) {
 }
 
 export default function SelectionPage(): React.JSX.Element {
+  const { streamCues } = useGeminiStream(); // optional, for UI streaming if still needed
+  const [geminiTips, setGeminiTips] = useState<Record<string, string>>({});
+
+
   const [selectedMuscles, setSelectedMuscles] = useState<ExtendedMuscle[]>([]);
   const [activeTab, setActiveTab] = useState<number>(0);
   const [selectedWorkout, setSelectedWorkout] = useState<number>(0);
   const router = useRouter();
 
   const [ttsLoading, setTtsLoading] = useState(false);
+
+  const generateTipsForMuscle = async (muscle: ExtendedMuscle) => {
+  const model = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY!).getGenerativeModel({
+    model: "gemini-2.5-flash-lite",
+  });
+
+  const tips: Record<string, string> = {};
+
+  for (const workout of muscle.workouts) {
+    const prompt = `Give 1 sentence, 10–20 words max, form-focused coaching tip for: ${workout.name}`;
+    const result = await model.generateContent(prompt);
+    const text = result.response.text().trim();
+    tips[workout.name] = text;
+  }
+
+  setGeminiTips(prev => ({ ...prev, ...tips }));
+};
+
 
   const playWorkoutTTS = async (muscle: ExtendedMuscle) => {
     setTtsLoading(true);
@@ -74,7 +100,11 @@ export default function SelectionPage(): React.JSX.Element {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           muscleName: muscle.name,
-          workouts: muscle.workouts.map(({ name, cues }) => ({ name, cues })),
+          workouts: muscle.workouts.map(({ name }) => ({
+            name,
+            cues: geminiTips[name] || "", // fallback to empty string if not yet generated
+          }))
+
         }),
       });
 
@@ -126,6 +156,8 @@ export default function SelectionPage(): React.JSX.Element {
             workouts: muscle.workouts || [],
           }));
           setSelectedMuscles(processedMuscles);
+          Promise.all(processedMuscles.map(m => generateTipsForMuscle(m)));
+
 
           // 👇 Fetch Gemini workout summaries
           fetch("/api/muscle-workout-summary", {
