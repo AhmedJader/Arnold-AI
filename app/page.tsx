@@ -88,7 +88,7 @@ export default function LandingPage(): React.JSX.Element {
           }}
           className="text-4xl sm:text-5xl md:text-7xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50"
         >
-          ARNOLD
+          ARNOLD AI
         </motion.h1>
 
         <motion.p
