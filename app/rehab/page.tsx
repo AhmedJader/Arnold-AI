@@ -1,4 +1,3 @@
-// app/rehab/page.tsx
 "use client";
 
 import dynamic from "next/dynamic";
@@ -11,8 +10,8 @@ const PoseClient = dynamic(() => import("@/components/PoseClient"), {
 
 export default function RehabPage() {
   return (
-    <main className="min-h-screen bg-black flex items-center justify-center p-6">
-      <div className="relative w-full max-w-3xl aspect-video rounded-xl overflow-hidden shadow-xl border border-white/10">
+    <main className="min-h-screen flex items-center justify-center bg-black p-4">
+      <div className="w-full max-w-5xl aspect-video relative rounded-xl overflow-hidden border border-white/10 shadow-2xl">
         <PoseClient />
       </div>
     </main>

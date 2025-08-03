@@ -8,12 +8,23 @@ import {
 } from "@mediapipe/tasks-vision";
 import { Card, CardContent } from "@/components/ui/card";
 
+const KEYPOINT_NAMES = [
+  "nose", "left_eye_inner", "left_eye", "left_eye_outer",
+  "right_eye_inner", "right_eye", "right_eye_outer",
+  "left_ear", "right_ear", "mouth_left", "mouth_right",
+  "left_shoulder", "right_shoulder", "left_elbow", "right_elbow",
+  "left_wrist", "right_wrist", "left_pinky", "right_pinky",
+  "left_index", "right_index", "left_thumb", "right_thumb",
+  "left_hip", "right_hip", "left_knee", "right_knee",
+  "left_ankle", "right_ankle", "left_heel", "right_heel",
+  "left_foot_index", "right_foot_index"
+];
+
 export default function PoseClient() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [feedback, setFeedback] = useState("");
   const [audio, setAudio] = useState("");
-
   const poseLandmarkerRef = useRef<PoseLandmarker | null>(null);
   const lastSentPoseRef = useRef<string | null>(null);
   const lastSentTimeRef = useRef<number>(0);
@@ -29,7 +40,7 @@ export default function PoseClient() {
       poseLandmarkerRef.current = await PoseLandmarker.createFromOptions(vision, {
         baseOptions: {
           modelAssetPath:
-            "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+            "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task",
         },
         runningMode: "VIDEO",
         numPoses: 1,
@@ -41,9 +52,6 @@ export default function PoseClient() {
         videoRef.current.onloadedmetadata = () => videoRef.current?.play();
       }
 
-      const canvasCtx = canvasRef.current?.getContext("2d")!;
-      const drawingUtils = new DrawingUtils(canvasCtx);
-
       interval = window.setInterval(async () => {
         if (!videoRef.current || !poseLandmarkerRef.current) return;
 
@@ -53,21 +61,29 @@ export default function PoseClient() {
           performance.now()
         );
 
-        canvasCtx.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
-        canvasCtx.drawImage(video, 0, 0, canvasRef.current!.width, canvasRef.current!.height);
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        // Match canvas size to video for accurate drawing
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext("2d")!;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         if (results.landmarks.length > 0) {
-          drawingUtils.drawLandmarks(results.landmarks[0]);
-          drawingUtils.drawConnectors(results.landmarks[0]);
+          const landmarks = results.landmarks[0];
+          const drawingUtils = new DrawingUtils(ctx);
+          drawingUtils.drawLandmarks(landmarks);
+          drawingUtils.drawConnectors(landmarks);
 
-          const keypoints = results.landmarks[0].map((kp) => ({
+          const keypoints = landmarks.map((kp, i) => ({
             x: kp.x,
             y: kp.y,
-            score: 1,
-            name: "",
+            score: 1, // fallback since NormalizedLandmark has no score
+            name: KEYPOINT_NAMES[i] ?? `kp-${i}`,
           }));
 
-          // ---- Deduplication and throttling logic ----
           const now = Date.now();
           const poseSignature = JSON.stringify(
             keypoints.map((k) => ({
@@ -80,7 +96,6 @@ export default function PoseClient() {
           const cooldownPassed = now - lastSentTimeRef.current > 12000;
 
           if (!poseChanged || !cooldownPassed) return;
-
           lastSentPoseRef.current = poseSignature;
           lastSentTimeRef.current = now;
 
@@ -94,37 +109,31 @@ export default function PoseClient() {
           setFeedback(data.feedback || "");
           setAudio(data.base64Audio || "");
         }
-      }, 2000); // Evaluate every 2 seconds
+      }, 2000);
     };
 
     runPoseDetection();
-
     return () => {
       if (interval) clearInterval(interval);
     };
   }, []);
 
   return (
-    <div className="relative h-screen w-screen bg-black overflow-hidden">
-      {/* Video + Canvas */}
-      <div className="absolute inset-0 z-0">
-        <video
-          ref={videoRef}
-          className="w-full h-full object-cover"
-          autoPlay
-          muted
-          playsInline
-        />
-        <canvas
-          ref={canvasRef}
-          width={640}
-          height={480}
-          className="absolute top-0 left-0 w-full h-full pointer-events-none"
-        />
-      </div>
+    <div className="relative w-full h-full">
+      <video
+        ref={videoRef}
+        className="absolute w-full h-full object-cover z-0"
+        autoPlay
+        muted
+        playsInline
+      />
+      <canvas
+        ref={canvasRef}
+        className="absolute top-0 left-0 w-full h-full pointer-events-none z-10"
+      />
 
       {/* Feedback Card */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-4">
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-md px-4">
         {feedback && (
           <Card className="backdrop-blur-md bg-white/10 border border-white/20 text-white shadow-xl">
             <CardContent className="p-4">
