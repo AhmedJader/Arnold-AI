@@ -113,7 +113,7 @@ export default function LandingPage(): React.JSX.Element {
             ease: [0.16, 1, 0.3, 1],
             delay: 0.5
           }}
-          onClick={() => router.push("/muscles")}
+          onClick={() => router.push("/userinput")}
           className="mt-8 inline-flex items-center justify-center px-10 py-4 rounded-full text-white font-medium bg-black/60 hover:bg-black/80 hover:cursor-pointer transition-all duration-300 hover:scale-105 shadow-2xl backdrop-blur-lg border border-white/10 hover:border-white/20 pointer-events-auto group"
         >
           <span className="relative z-10">Explore</span>
