@@ -231,9 +231,11 @@ export default function SelectionPage(): React.JSX.Element {
           />
 
           {/* Workout Detail Panel */}
-          <WorkoutDetailPanel
-            currentWorkout={currentWorkout}
-          />
+          <div className="overflow-y-auto flex-1 p-4 space-y-4">
+            {currentMuscle?.workouts.map((workout, i) => (
+              <WorkoutDetailPanel key={i} currentWorkout={workout} />
+            ))}
+          </div>
 
           {/* TTS Button: Reads all workout cues for selected muscle */}
           {currentMuscle && (
