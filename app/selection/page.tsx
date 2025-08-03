@@ -45,6 +45,29 @@ export default function SelectionPage(): React.JSX.Element {
   const [selectedWorkout, setSelectedWorkout] = useState<number>(0);
   const router = useRouter();
 
+  const [ttsLoading, setTtsLoading] = useState(false);
+
+  const playWorkoutTTS = async (muscleName: string) => {
+    setTtsLoading(true);
+    try {
+      const res = await fetch("/api/muscle-workout-tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ muscleName }),
+      });
+
+      const { base64Audio } = await res.json();
+      const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`);
+      audio.play();
+
+    } catch (err) {
+      console.error("TTS Error:", err);
+    } finally {
+      setTtsLoading(false);
+    }
+  };
+
+
   useEffect(() => {
     const stored = localStorage.getItem("selectedMuscles");
     if (stored) {
@@ -66,8 +89,39 @@ export default function SelectionPage(): React.JSX.Element {
     router.push("/");
   }, [router]);
 
+  useEffect(() => {
+    const stored = localStorage.getItem("selectedMuscles");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const processedMuscles = parsed.map(muscle => ({
+            ...muscle,
+            workouts: muscle.workouts || [],
+          }));
+          setSelectedMuscles(processedMuscles);
+
+          // 👇 Fetch Gemini workout summaries
+          fetch("/api/muscle-workout-summary", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ muscleNames: processedMuscles.map(m => m.name) }),
+          })
+            .then(res => res.text())
+            .then(text => console.log("Workout Summaries:\n", text)); // TODO: store in state/UI
+
+          return;
+        }
+      } catch (error) {
+        console.error("Error parsing stored muscles:", error);
+      }
+    }
+    router.push("/");
+  }, [router]);
+
+
   const handleBack = (): void => router.push("/");
-  
+
   const clearSelection = (): void => {
     localStorage.removeItem("selectedMuscles");
     router.push("/");
@@ -78,17 +132,17 @@ export default function SelectionPage(): React.JSX.Element {
       <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden">
         {/* Animated Spotlight Background */}
         <Spotlight />
-        
+
         {/* Subtle overlay gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/40 pointer-events-none" />
-        
+
         <div className="text-center text-white relative z-10">
           {/* Modern loading spinner */}
           <div className="relative mx-auto mb-8 w-16 h-16">
             <div className="absolute inset-0 rounded-full border-2 border-gray-800"></div>
             <div className="absolute inset-0 rounded-full border-t-2 border-l-2 border-blue-500 animate-spin"></div>
           </div>
-          
+
           <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
             Loading...
           </h2>
@@ -121,7 +175,7 @@ export default function SelectionPage(): React.JSX.Element {
     <div className="min-h-screen bg-black flex flex-col relative overflow-hidden">
       {/* Animated Spotlight Background */}
       <Spotlight />
-      
+
       {/* Subtle overlay gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/40 pointer-events-none" />
 
@@ -154,6 +208,18 @@ export default function SelectionPage(): React.JSX.Element {
           <WorkoutDetailPanel
             currentWorkout={currentWorkout}
           />
+
+          {/* TTS Button */}
+          {currentMuscle && (
+            <button
+              onClick={() => playWorkoutTTS(currentMuscle.name)}
+              disabled={ttsLoading}
+              className="mx-6 mt-4 mb-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded text-sm"
+            >
+              {ttsLoading ? "Generating audio..." : `🔊 Hear Workout Summary`}
+            </button>
+          )}
+
 
           {/* Export Button Section - exact original structure */}
           <div className="p-6 border-t border-gray-700/30">

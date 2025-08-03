@@ -1,8 +1,7 @@
-// app/api/muscle-info/route.ts
+// app/api/muscle-workout-summary/route.ts
 import { NextRequest } from "next/server";
 import { streamText } from "ai";
-import { google } from "@ai-sdk/google"; // Gemini
-
+import { google } from "@ai-sdk/google";
 
 export async function POST(req: NextRequest) {
   const { muscleNames } = await req.json();
@@ -12,7 +11,8 @@ export async function POST(req: NextRequest) {
     messages: [
       {
         role: "system",
-        content: `You're a certified fitness coach. For each muscle name, return one sentence summarizing its function.`,
+        content:
+          "You're a certified personal trainer. For each muscle name provided, respond with a single, concise sentence describing a typical workout targeting that muscle. Keep it clear and actionable.",
       },
       {
         role: "user",
