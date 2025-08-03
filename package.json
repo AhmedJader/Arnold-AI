@@ -26,6 +26,7 @@
     "drizzle-orm": "^0.44.4",
     "drizzle-zod": "^0.8.2",
     "file-saver": "^2.0.5",
+    "googleapis": "^154.1.0",
     "lucide-react": "^0.536.0",
     "motion": "^12.23.12",
     "nanoid": "^5.1.5",
