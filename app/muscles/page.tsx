@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { MUSCLE_GROUPS } from "@/lib/constants/muscleGroups";
 import { Spotlight } from "@/components/ui/spotlight-new";
+import MuscleInsights from "@/components/MuscleInsights";
+import MuscleInsightsPopup from "@/components/MuscleInsightsPopup";
 
 interface MuscleConfig {
   color: string;
@@ -149,6 +151,10 @@ function CameraController() {
 }
 
 export default function MuscleSelectorPage() {
+  const [activePopupKey, setActivePopupKey] = useState<string | null>(null);
+
+  const [aiSummaries, setAiSummaries] = useState<Record<string, string>>({});
+
   const [selectedMuscles, setSelectedMuscles] = useState<Set<string>>(new Set());
   const [showInstructions, setShowInstructions] = useState(true);
   const router = useRouter();
@@ -159,7 +165,21 @@ export default function MuscleSelectorPage() {
       newSet.has(muscleKey) ? newSet.delete(muscleKey) : newSet.add(muscleKey);
       return newSet;
     });
+
+    if (aiSummaries[muscleKey]) {
+      setActivePopupKey(muscleKey); // open popup if already fetched
+    }
   };
+
+  useEffect(() => {
+    const cached = localStorage.getItem("aiSummaries");
+    if (cached) setAiSummaries(JSON.parse(cached));
+  }, []);
+
+
+
+
+
 
   const handleNext = () => {
     const selectedData = Array.from(selectedMuscles).map((key) => ({
@@ -237,6 +257,14 @@ export default function MuscleSelectorPage() {
             maxDistance={8}   // Reduced from 10 for better control
           />
         </Canvas>
+
+        {activePopupKey && aiSummaries[activePopupKey] && (
+          <MuscleInsightsPopup
+            muscleKey={activePopupKey}
+            summary={aiSummaries[activePopupKey]}
+            onClose={() => setActivePopupKey(null)}
+          />
+        )}
 
         {/* Instructions */}
         {showInstructions && (
@@ -359,6 +387,26 @@ export default function MuscleSelectorPage() {
                     </button>
                   </motion.div>
                 ))}
+                {/* AI Summaries */}
+                {selectedMuscles.size > 0 && (
+                  <div className="mt-6">
+                    <MuscleInsights
+                      muscleKeys={Array.from(selectedMuscles)}
+                      onUpdate={(summaries) => {
+                        setAiSummaries((prev) => {
+                          const updated = { ...prev, ...summaries };
+                          localStorage.setItem("aiSummaries", JSON.stringify(updated));
+                          return updated;
+                        });
+
+                        const firstKey = Object.keys(summaries)[0];
+                        if (firstKey) setActivePopupKey(firstKey);
+                      }}
+
+                    />
+                  </div>
+                )}
+
               </motion.div>
             ) : (
               <div className="text-gray-400 italic py-6 text-center border-2 border-dashed border-gray-600/50 rounded-2xl bg-black/20">
