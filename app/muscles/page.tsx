@@ -176,12 +176,12 @@ export default function MuscleSelectorPage() {
     <div className="w-full h-screen flex flex-col bg-black relative overflow-hidden">
       {/* Animated Spotlight Background */}
       <Spotlight />
-      
+
       {/* Subtle overlay gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/40 pointer-events-none" />
 
       {/* Header */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
@@ -196,7 +196,7 @@ export default function MuscleSelectorPage() {
               Interactive selection for your personalized workout
             </p>
           </div>
-          <motion.div 
+          <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
@@ -240,7 +240,7 @@ export default function MuscleSelectorPage() {
 
         {/* Instructions */}
         {showInstructions && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -100 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
@@ -275,7 +275,7 @@ export default function MuscleSelectorPage() {
         )}
 
         {/* Quick Actions */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: 100 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
@@ -311,7 +311,7 @@ export default function MuscleSelectorPage() {
       </div>
 
       {/* Bottom Panel */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2 }}
@@ -326,7 +326,7 @@ export default function MuscleSelectorPage() {
               </span>
             </h3>
             {selectedMuscles.size > 0 ? (
-              <motion.div 
+              <motion.div
                 layout
                 className="flex flex-wrap gap-3 max-h-24 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
               >
@@ -341,7 +341,7 @@ export default function MuscleSelectorPage() {
                   >
                     <div
                       className="w-4 h-4 rounded-full shadow-md"
-                      style={{ 
+                      style={{
                         backgroundColor: MUSCLE_GROUPS[key].color,
                         boxShadow: `0 0 15px ${MUSCLE_GROUPS[key].color}50`
                       }}
@@ -373,11 +373,11 @@ export default function MuscleSelectorPage() {
               whileTap={{ scale: selectedMuscles.size > 0 ? 0.95 : 1 }}
               onClick={handleNext}
               disabled={selectedMuscles.size === 0}
-              className="group relative bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 hover:from-blue-500 hover:via-blue-400 hover:to-purple-500 disabled:from-gray-700 disabled:via-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed px-10 py-5 rounded-2xl font-bold text-xl text-white shadow-2xl transition-all duration-300 disabled:opacity-50 border border-white/10"
+              className="group relative bg-gradient-to-r from-[#1e293b] via-[#334155] to-[#4c1d95] hover:from-[#334155] hover:via-[#475569] hover:to-[#6d28d9] disabled:from-gray-800 disabled:via-gray-700 disabled:to-gray-800 disabled:cursor-not-allowed px-10 py-5 rounded-2xl font-bold text-xl text-white shadow-xl transition-all duration-300 disabled:opacity-50 border border-white/10"
             >
-              <div className="flex items-center ">
+              <div className="flex items-center gap-3">
                 <span>Continue</span>
-                <div className="bg-white/20 rounded-xl px-3 py-1 text-base font-bold text-center">
+                <div className="bg-white/10 rounded-xl px-3 py-1 text-base font-bold">
                   {selectedMuscles.size}
                 </div>
                 <svg
@@ -386,13 +386,19 @@ export default function MuscleSelectorPage() {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
                 </svg>
               </div>
               <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-[200%] transition-transform duration-1000"></div>
               </div>
             </motion.button>
+
           </div>
         </div>
       </motion.div>
