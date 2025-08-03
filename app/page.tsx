@@ -121,21 +121,29 @@ export default function LandingPage(): React.JSX.Element {
         </motion.button>
       </div>
 
-      {/* Footer */}
-      <motion.footer
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ 
-          duration: 0.8, 
-          ease: [0.16, 1, 0.3, 1],
-          delay: 0.7 
-        }}
-        className="relative z-50 pb-6 text-center pointer-events-none"
-      >
-        <p className="text-xs animate-pulse sm:text-base bg-clip-text text-transparent bg-gradient-to-b from-neutral-300 to-neutral-600">
-          Terrahacks 2025 - By Omid Latifi & Ahmed Abduljader
-        </p>
-      </motion.footer>
+<motion.footer
+  initial={{ y: 20, opacity: 0 }}
+  animate={{ y: 0, opacity: 1 }}
+  transition={{
+    duration: 0.8,
+    ease: [0.16, 1, 0.3, 1],
+    delay: 0.7
+  }}
+  className="relative z-50 pb-6 text-center"
+>
+  <p className="text-xs animate-pulse sm:text-base bg-clip-text text-transparent bg-gradient-to-b from-neutral-300 to-neutral-600">
+    Terrahacks 2025 – By Omid Latifi & Ahmed Abduljader
+  </p>
+  <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+    <a
+      href="/privacy"
+      className="underline hover:text-neutral-800 dark:hover:text-white transition-colors"
+    >
+      Privacy Policy
+    </a>
+  </p>
+</motion.footer>
+
     </div>
   );
 }
