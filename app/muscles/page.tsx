@@ -185,33 +185,33 @@ export default function MuscleSelectorPage() {
   const router = useRouter();
 
   const handleMuscleSelect = async (muscleKey: string) => {
-  setSelectedMuscles((prev) => {
-    const newSet = new Set(prev);
-    newSet.has(muscleKey) ? newSet.delete(muscleKey) : newSet.add(muscleKey);
-    return newSet;
-  });
-
-  // If already cached, open popup
-  if (aiSummaries[muscleKey]) {
-    setActivePopupKey(muscleKey);
-    return;
-  }
-
-  // Otherwise, fetch it
-  try {
-    const summary = await fetchMuscleSummary(muscleKey);
-
-    setAiSummaries((prev) => {
-      const updated = { ...prev, [muscleKey]: summary };
-      localStorage.setItem("aiSummaries", JSON.stringify(updated));
-      return updated;
+    setSelectedMuscles((prev) => {
+      const newSet = new Set(prev);
+      newSet.has(muscleKey) ? newSet.delete(muscleKey) : newSet.add(muscleKey);
+      return newSet;
     });
 
-    setActivePopupKey(muscleKey);
-  } catch (err) {
-    console.error("❌ Failed to fetch summary for", muscleKey, err);
-  }
-};
+    // If already cached, open popup
+    if (aiSummaries[muscleKey]) {
+      setActivePopupKey(muscleKey);
+      return;
+    }
+
+    // Otherwise, fetch it
+    try {
+      const summary = await fetchMuscleSummary(muscleKey);
+
+      setAiSummaries((prev) => {
+        const updated = { ...prev, [muscleKey]: summary };
+        localStorage.setItem("aiSummaries", JSON.stringify(updated));
+        return updated;
+      });
+
+      setActivePopupKey(muscleKey);
+    } catch (err) {
+      console.error("❌ Failed to fetch summary for", muscleKey, err);
+    }
+  };
 
 
   useEffect(() => {
@@ -399,7 +399,8 @@ export default function MuscleSelectorPage() {
             {selectedMuscles.size > 0 ? (
               <motion.div
                 layout
-                className="flex flex-wrap gap-3 max-h-24 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
+                className="flex flex-wrap gap-3 max-h-24 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent pr-2"
+
               >
                 {Array.from(selectedMuscles).map((key, index) => (
                   <motion.div
@@ -408,7 +409,7 @@ export default function MuscleSelectorPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="group backdrop-blur-xl bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl px-5 py-3 flex items-center gap-3 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                    className="group backdrop-blur-xl bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl px-5 py-3 flex items-center gap-3 transition-all duration-300  hover:shadow-lg"
                   >
                     <div
                       className="w-4 h-4 rounded-full shadow-md"
@@ -431,7 +432,7 @@ export default function MuscleSelectorPage() {
                   </motion.div>
                 ))}
                 {/* AI Summaries */}
-                
+
 
               </motion.div>
             ) : (
